@@ -1,0 +1,505 @@
+{
+  "name": "Client Responder",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-3088, -880],
+      "id": "30fc5a9c-f211-4945-81e2-61dca655ce77",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://dummyjson.com/products?limit=0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-2784, -880],
+      "id": "b2e82ada-434e-4937-a487-fe6fd96fb5e6",
+      "name": "HTTP Request",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const products = items[0].json.products || [];\n\nreturn products.map(product => {\n  return {\n    json: {\n      id: product.id,\n      name: product.title,\n      price: product.price,\n      category: product.category,\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-2544, -864],
+      "id": "83178638-741d-4649-abc2-2b207e4a827a",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1Vo1XcCHx_cfFwsddwfNTw-D8ZOiRrbuev6lsADlYXFM",
+          "mode": "list",
+          "cachedResultName": "Infos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Vo1XcCHx_cfFwsddwfNTw-D8ZOiRrbuev6lsADlYXFM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Vo1XcCHx_cfFwsddwfNTw-D8ZOiRrbuev6lsADlYXFM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "price",
+              "displayName": "price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [-2112, -880],
+      "id": "b3975146-5e1d-4114-a761-12943ac86319",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Y1o3ttmf7BZ7CAJs",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.content.parts[0].text;\n\ntext = input.replace(/^```json\\s*|\\s*```$/g, \"\");\n\nconst parsedData = JSON.parse(text);\n\nreturn [{\n  json: {\n    title: parsedData.title || \"\",\n    date: parsedData.Date || \"\",\n    description: parsedData.description || \"\",\n    product_quantity: parsedData.product_quantity,\n    product_reference: parsedData.product_reference || \"\"\n  }\n}];"
+      },
+      "id": "75e7cc1d-0a54-403e-b028-313f721dfe62",
+      "name": "Extract Data",
+      "type": "n8n-nodes-base.code",
+      "position": [-2192, -1232],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Vo1XcCHx_cfFwsddwfNTw-D8ZOiRrbuev6lsADlYXFM",
+          "mode": "list",
+          "cachedResultName": "Infos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Vo1XcCHx_cfFwsddwfNTw-D8ZOiRrbuev6lsADlYXFM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Vo1XcCHx_cfFwsddwfNTw-D8ZOiRrbuev6lsADlYXFM/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "id",
+              "lookupValue": "={{ $json.product_reference }}"
+            },
+            {
+              "lookupColumn": "name",
+              "lookupValue": "={{ $json.product_reference }}"
+            }
+          ]
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "id": "a333e1ef-a3ca-4c1d-aacd-e270b4a9c733",
+      "name": "Product Database",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [-1968, -1168],
+      "typeVersion": 4.6,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Y1o3ttmf7BZ7CAJs",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = [];\n\nfor (const item of $input.all()) {\n  const emailData = item.json;\n  \n  // Handle sender information (unchanged)\n  let senderEmail = '';\n  let senderName = '';\n\n  if (emailData.from?.value?.[0]) {\n    senderEmail = emailData.from.value[0].address || '';\n    senderName = emailData.from.value[0].name || senderEmail;\n  } else if (emailData.from?.text) {\n    const emailMatch = emailData.from.text.match(/<([^>]+)>/) || \n                      emailData.from.text.match(/([^\\s]+@[^\\s]+)/);\n    senderEmail = emailMatch ? emailMatch[1] : emailData.from.text;\n    \n    const nameMatch = emailData.from.text.match(/^([^<]+)/);\n    senderName = nameMatch ? nameMatch[1].trim().replace(/\\\"/g, '') : senderEmail;\n  }\n\n  // Format date (unchanged)\n  const receivedDate = new Date(emailData.date || emailData.receivedTime);\n  const formattedDate = receivedDate.toLocaleString('en-US', {\n    year: 'numeric',\n    month: '2-digit',\n    day: '2-digit',\n    hour: '2-digit',\n    minute: '2-digit',\n    hour12: true\n  });\n\n  // FIXED CONTENT EXTRACTION\n  let emailContent = '';\n  \n  // 1. First priority: Plain text version\n  if (emailData.text) {\n    emailContent = emailData.text;\n  } \n  // 2. Second priority: HTML version (convert to plain text)\n  else if (emailData.html) {\n    emailContent = emailData.html\n      .replace(/<style[^>]*>.*?<\\/style>/gs, '')  // Remove CSS\n      .replace(/<[^>]*>/g, ' ')                   // Strip HTML tags\n      .replace(/\\s+/g, ' ')                       // Collapse whitespace\n      .trim();\n  }\n  // 3. Fallback to other possible fields\n  else if (emailData.body || emailData.textPlain || emailData.textHtml) {\n    emailContent = emailData.body || emailData.textPlain || emailData.textHtml;\n  }\n\n  // Truncate content if too long\n  const maxContentLength = 5000;\n  if (emailContent.length > maxContentLength) {\n    emailContent = emailContent.substring(0, maxContentLength) + '... [truncated]';\n  }\n\n  // Create row data\n  const rowData = {\n    'Date': formattedDate,\n    'Sender Name': senderName,\n    'Sender Email': senderEmail,\n    'Subject': emailData.subject || 'No Subject',\n    'Content': emailContent,\n    //'Message ID': emailData.messageId || '',\n    'Has Attachments': emailData.attachments?.length > 0 ? 'Yes' : 'No'\n  };\n  \n  items.push({ json: rowData });\n}\n\nreturn items;"
+      },
+      "id": "a0cd2160-7998-414d-a4d0-6ec497a50dbe",
+      "name": "info1",
+      "type": "n8n-nodes-base.code",
+      "position": [-2768, -1232],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "=everyHour",
+              "minute": 59
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "labelIds": ["CATEGORY_PERSONAL"]
+        },
+        "options": {
+          "downloadAttachments": false
+        }
+      },
+      "id": "ed8332b8-8fd8-4882-8dbd-858217398fee",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "position": [-2992, -1232],
+      "typeVersion": 1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VBA5Qwp3jOH0XufZ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "boardItem",
+        "boardId": "5020424282",
+        "groupId": "group_mkx65t02",
+        "name": "={{ $json.task_title }}",
+        "additionalFields": {
+          "columnValues": "={\n  \"long_text_mkx6ysnf\": {{ JSON.stringify($json.task_description) }},\n\"text_mkx6j9wd\": {{ JSON.stringify($json.customer_name) }},\n\"phone_mkx6rmj7\": {{ JSON.stringify($json.customer_contact) }},\n\"date_mkx6wj4v\": {{ JSON.stringify($json.delivery_date) }},\n\"text_mkx6tbqe\": {{ JSON.stringify($json.product_id) }},\n\"text_mkx61cd2\": {{ JSON.stringify($json.product_name) }},\n  \"numeric_mkx68bf7\": {{ JSON.stringify($json.product_price) }},\n  \"color_mkx6ktyw\": {{ JSON.stringify($json.priority) }},\n\"text_mkx647bb\": {{ JSON.stringify($json.product_category) }},\n\"numeric_mkx67jf6\": {{ JSON.stringify($json.product_quantity) }}\n}\n"
+        }
+      },
+      "type": "n8n-nodes-base.mondayCom",
+      "typeVersion": 1,
+      "position": [-944, -1232],
+      "id": "ecc281d8-37f3-454a-ac97-c95b37682a5c",
+      "name": "Create an item in a board's group",
+      "credentials": {
+        "mondayComOAuth2Api": {
+          "id": "QagNqR3NM3t669ia",
+          "name": "Monday.com account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [-1744, -1232],
+      "id": "4380be22-aaab-4fd3-b123-8b982ce81879",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.content.parts[0].text;\n\n// Remove Markdown code block formatting\nconst text = input.replace(/^```json\\s*|\\s*```$/g, \"\");\n\n// Parse JSON safely\nlet parsedData = {};\ntry {\n  parsedData = JSON.parse(text);\n} catch (error) {\n  throw new Error(\"Invalid JSON format in input text\");\n}\n\n// Return structured output\nreturn [{\n  json: {\n    task_title: parsedData.task_title || \"\",\n    task_description: parsedData.task_description || \"\",\n    customer_name: parsedData.customer_name || \"\",\n    customer_contact: parsedData.customer_contact || \"\",\n    delivery_date: parsedData.delivery_date || \"\",\n    product_id: parsedData.product_id || \"\",\n    product_name: parsedData.product_name || \"\",\n    product_category: parsedData.product_category || \"\",\n    product_price: parsedData.product_price || \"\",\n    priority: parsedData.priority || \"\",\n    product_quantity: parsedData.product_quantity\n  }\n}];"
+      },
+      "id": "c9d00b0a-48d2-4161-821b-8e3491b1506a",
+      "name": "Extract Monday Task Data",
+      "type": "n8n-nodes-base.code",
+      "position": [-1168, -1232],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## Data Loader Pipeline\n",
+        "height": 304,
+        "width": 1312
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-3136, -944],
+      "typeVersion": 1,
+      "id": "66774524-f962-41a5-bd9f-976556ca9074",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an assistant that converts customer emails and product lookup data into a clean, structured task for Monday.com, make sure product is same as found from product info, if not create a task for not available product.\n\nInput info:\n\ntitle: {{ $json.title }}\ndate: {{ $json.date }}\ndescription: {{ $json.description }}\nproduct_id: {{ $json.id }}\nname: {{ $json.name }}\nprice: {{ $json.price }}\ncategory: {{ $json.category }}\nproduct_quantity: {{ $json.product_quantity }}\n\n\n\nYour goal is to analyze the email information (title, description, date, and customer details) and the associated product details (id, name, price, category).\n\nExtract and output a JSON object with the following keys:\n{\n  \"task_title\": \"Concise and human-readable task title summarizing the request\",\n  \"task_description\": \"A professional, well-formatted task description combining customer info, product details, and the main issue/request\",\n  \"customer_name\": \"Full customer name, if available\",\n  \"customer_contact\": \"Phone or email if available\",\n  \"delivery_date\": \"Delivery or due date, if mentioned (ISO format if possible)\",\n  \"product_id\": \"Product ID as string or number\",\n  \"product_name\": \"Product name from lookup\",\n  \"product_category\": \"Product categorty\",\n  \"product_price\": \"Product price, numeric\",\n  \"priority\": \"High | Medium | Low, inferred from words like 'urgent', 'immediate', etc.\",\n\"product_quantity\": \"Make sure get product quantity\"\n}\n\nGuidelines:\n- Always ensure the JSON is valid. No output shoud have json wrapper\n- Infer the priority level logically from the email content.\n- If any field is missing, set it to null (do not omit it).\n- The description should read naturally, suitable for direct posting in a task management tool.\n\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [-1520, -1232],
+      "id": "da68bac6-7042-4d11-a012-8f3de3570382",
+      "name": "Task Details Generator",
+      "retryOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ifUHD8ic0NvT5jFu",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an assistant that converts customer emails into structured tasks.\nFrom the following email, extract:\n\n1. A short title for the task.\n2. A detailed description.\n3. Product Quantity\n4. The referenced product name or product ID, if any - make sure to redurn either the id in number or exact product name.\n\nEmail Subjec:\n{{ $json.Subject }}\n\nEMAIL Content:\n{{ $json.Content }}\n\nOutput strictly as JSON:\n{\n  \"title\": \"...\",\n  \"Date\": \"{{ $json.Date }}\",\n  \"description\": \"...\",\n  \"product_quantity\": \"...\",\n  \"product_reference\": \"...\"\n}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [-2544, -1248],
+      "id": "43f354c2-4f9c-4a63-9f4f-af949db28ae5",
+      "name": "Extract Relevant Customer Details",
+      "retryOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ifUHD8ic0NvT5jFu",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Email Monitoring for Customer Task Creation  Pipeline",
+        "height": 352,
+        "width": 2384
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-3104, -1344],
+      "typeVersion": 1,
+      "id": "d12dbb90-1b9b-4cb7-9fce-93ca8f6492d9",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {
+    "Extract Relevant Customer Details": [
+      {
+        "json": {
+          "content": {
+            "parts": [
+              {
+                "text": "```json\n{\n  \"title\": \"Urgent Order for Red T-Shirt (ID 42)\",\n  \"Date\": \"10/10/2025, 00:00 AM\",\n  \"description\": \"Customer John Doe (Phone: +880123456789, Address: 45 Park Street, Dhaka) has placed an urgent order for 3 units of Red T-Shirt (Product ID: 42). Delivery is requested by October 10, 2025. Please confirm once this is scheduled.\",\n  \"product_quantity\": \"3\",\n  \"product_reference\": \"42\"\n}\n```"
+              }
+            ],
+            "role": "model"
+          },
+          "finishReason": "STOP",
+          "index": 0
+        }
+      }
+    ],
+    "Product Database": [
+      {
+        "json": {
+          "row_number": 43,
+          "id": 42,
+          "name": "Water",
+          "price": 0.99,
+          "category": "groceries"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Data": {
+      "main": [
+        [
+          {
+            "node": "Product Database",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product Database": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "info1": {
+      "main": [
+        [
+          {
+            "node": "Extract Relevant Customer Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "info1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Task Details Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Monday Task Data": {
+      "main": [
+        [
+          {
+            "node": "Create an item in a board's group",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Task Details Generator": {
+      "main": [
+        [
+          {
+            "node": "Extract Monday Task Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Relevant Customer Details": {
+      "main": [
+        [
+          {
+            "node": "Extract Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4cf93f99-d6d7-49ef-9da3-14c86ba90023",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "84210a89cf0f8b71eca0a845f2a0289032a3a9a6a7ff30a447d9187373d78921"
+  },
+  "id": "GFYWaMu5FUYCnmCU",
+  "tags": []
+}
