@@ -1,4 +1,4 @@
-# Client Responder
+# Gmail-to-Monday Intelligent Order Processing Pipeline
 
 This is an end to end pipeline that monitors gmail for customer message, extracts the necessary details and creates an task in Monday.com task manager.
 

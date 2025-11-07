@@ -1,7 +1,7 @@
 # n8n Workflows
 
 My n8n workflows
-# n8n_workflows
-# n8n_workflows
-# n8n_workflows
-# n8n_workflows
+
+## List of workflows
+
+- [Gmail-to-Monday Intelligent Order Processing Pipeline](./email_to_task_creation/)
